@@ -27,10 +27,10 @@ def send_alert(camera_id, frame):
 def main():
     image = './image2.jpg'
 
-    # confidence, frame = detection(image)
+    confidence, frame = detection(image)
 
-    # if confidence != None:
-    #     send_alert(1, frame)
+    if confidence != None:
+        send_alert(1, frame)
 
 
 main()
