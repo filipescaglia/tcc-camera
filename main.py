@@ -1,5 +1,9 @@
 import sys
 import requests
+from gpiozero import MotionSensor
+from picamera import PiCamera
+import time
+import datetime
 
 sys.path.append('./dependencies')
 
@@ -24,13 +28,24 @@ def send_alert(camera_id, frame):
         print(e)
         pass
 
+# Function to create new Filename from date and time into 'images' folder
+def getFileName():
+    return 'images/' + datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S.jpg")
+
 def main():
-    image = './image2.jpg'
+    pir = MotionSensor(26)
+    camera = PiCamera()
 
+    while True:    
+    image = getFileName() # Gets a filename
+    pir.wait_for_motion() # Waits for motion on the sensor
+    print("Movimento detectado") # Prints 'Movimento detectado' on terminal
+    #camera.start_preview() # Starts camera live preview
+    camera.capture(filename) # Gets the image from camera
+    #camera.stop_preview() # Stops camera live preview
     confidence, frame = detection(image)
-
     if confidence != None:
         send_alert(1, frame)
-
+    time.sleep(5) # Waits 5 seconds for another work cycle
 
 main()
