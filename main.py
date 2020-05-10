@@ -32,6 +32,14 @@ def send_alert(camera_id, image, frame):
 def getFileName():
     return 'images/' + datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S.jpg")
 
+def genLog(type):
+    f = open("logs/" + datetime.datetime.now().strftime("%Y-%m-%d.txt"), "a+")
+    if type == 'pes':
+        f.write("Pessoa detectada em " + datetime.datetime.now().strftime("%Y-%m-%d %H.%M.%S") + "\r\n")
+    elif type == 'mov':
+        f.write("Movimento sem pessoa detectado em " + datetime.datetime.now().strftime("%Y-%m-%d %H.%M.%S") + "\r\n")
+    f.close()
+
 def main():
     pir = MotionSensor(26)
     camera = PiCamera()
@@ -46,6 +54,10 @@ def main():
         confidence, frame = detection(image)
         if confidence != None:
             send_alert(1, image, frame)
+            print("Pessoa detectada") # Debugging
+            genLog('pes') # Generates a person detection log
+        else:
+            genLog('mov') # Generates a motion detection log without a person
         time.sleep(5) # Waits 5 seconds for another work cycle
 
 main()
