@@ -12,7 +12,7 @@ from detection import detection
 def send_alert(camera_id, image, frame):
     try:
         
-        url = 'http://192.168.15.21:8000/api/alert'
+        url = 'http://192.168.15.10:8000/api/alert'
 
         headers = { 'content-type': "multipart/form-data",
                     'accept': "application/json" }
@@ -47,14 +47,14 @@ def main():
     while True:    
         image = getFileName() # Gets a filename
         pir.wait_for_motion() # Waits for motion on the sensor
-        print("Movimento detectado") # Prints 'Movimento detectado' on terminal
+        print("Movimento detectado - " + datetime.datetime.now().strftime("%H.%M.%S")) # Prints 'Movimento detectado' on terminal
         #camera.start_preview() # Starts camera live preview
         camera.capture(image) # Gets the image from camera
         #camera.stop_preview() # Stops camera live preview
         confidence, frame = detection(image)
         if confidence != None:
             send_alert(1, image, frame)
-            print("Pessoa detectada") # Debugging
+            print("Pessoa detectada - " + datetime.datetime.now().strftime("%H.%M.%S")) # Debugging
             genLog('pes') # Generates a person detection log
         else:
             genLog('mov') # Generates a motion detection log without a person
