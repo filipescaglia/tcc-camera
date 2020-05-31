@@ -5,15 +5,47 @@ from detection import detection
 
 sys.path.append('./dependencies')
 
+HOST = "http://192.168.15.10:8000"
+CAMERA_CODE = 123456
+CAMERA_SECRET = 123456
+
+# Run when camera turns on
+def start_camera():
+    try:
+        url = HOST + "/camera"
+
+        headers = { "content-type": "multipart/form-data",
+                    "accept": "application/json" }
+
+        camera = PiCamera()
+
+        image = getFileName() # Gets a filename
+
+        camera.capture(image) # Gets the image from camera
+
+        # Não sei se vai funcinar na PiCamera (Provalvemente vai)
+        imencoded = cv2.imencode(".jpeg", image)[1]
+        file = { "image": (image, imencoded.tostring(), "image/jpeg") } 
+
+        data = { "code": CAMERA_CODE, "secret": CAMERA_SECRET }
+
+        response = requests.post(url, data=data, files=file)
+
+        print(response)
+
+    except Exception as e:
+        print(e)
+        pass
+
 def send_alert(camera_id, image, frame):
     try:
         
-        url = 'http://192.168.15.10:8000/api/alert'
+        url = HOST + '/api/alert'
 
         headers = { 'content-type': "multipart/form-data",
                     'accept': "application/json" }
 
-        data = { 'camera_id': camera_id, 'has_human': 1 }
+        data = { 'code': CAMERA_CODE, 'secret': CAMERA_SECRET, 'has_human': 1 }
 
         file = { 'image': (image, frame.tostring(), 'image/jpeg') }
 
