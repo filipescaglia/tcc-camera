@@ -1,4 +1,4 @@
-import sys, requests, time, datetime, os
+import sys, requests, time, datetime, os, cv2
 from gpiozero import MotionSensor
 from picamera import PiCamera
 from detection import detection
@@ -61,6 +61,14 @@ def main():
         #camera.start_preview() # Starts camera live preview
         camera.capture(image) # Gets the image from camera
         print("Imagem capturada")
+        resize = cv2.imread(image, cv2.IMREAD_UNCHANGED)
+        scale_percent = 38 # percent of original size
+        width = int(resize.shape[1] * scale_percent / 100)
+        height = int(resize.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        # resize image
+        resized = cv2.resize(resize, dim, interpolation = cv2.INTER_AREA)
+        cv2.imwrite(image, resized)
         #camera.stop_preview() # Stops camera live preview
         confidence, frame = detection(image)
         if confidence != None:
