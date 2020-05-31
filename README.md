@@ -15,3 +15,6 @@
 - gitignore.
 - getHour()
 - resizeImage()
+
+## v.1.3.1 - final
+- ignore tst.py
