@@ -28,6 +28,15 @@ def send_alert(camera_id, image, frame):
 def getFileName():
     return 'images/' + datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S.jpg")
 
+def resizeImage(image):
+    resize = cv2.imread(image, cv2.IMREAD_UNCHANGED)
+    scale_percent = 38 # percent of original size
+    width = int(resize.shape[1] * scale_percent / 100)
+    height = int(resize.shape[0] * scale_percent / 100)
+    dim = (width, height)
+    resized = cv2.resize(resize, dim, interpolation = cv2.INTER_AREA)
+    cv2.imwrite(image, resized)
+
 def genLog(type):
     f = open("logs/" + datetime.datetime.now().strftime("%Y-%m-%d.txt"), "a+")
     if type == 'pes':
@@ -35,6 +44,9 @@ def genLog(type):
     elif type == 'mov':
         f.write("Movimento sem pessoa detectado em " + datetime.datetime.now().strftime("%Y-%m-%d %H.%M.%S") + "\r\n")
     f.close()
+
+def getHour():
+    return datetime.datetime.now().strftime("%H.%M.%S")
 
 def eraseImages(count):
     if count == 10:
@@ -57,27 +69,17 @@ def main():
         execCount += 1
         image = getFileName() # Gets a filename
         pir.wait_for_motion() # Waits for motion on the sensor
-        print("Movimento detectado - " + datetime.datetime.now().strftime("%H.%M.%S")) # Prints 'Movimento detectado' on terminal
-        #camera.start_preview() # Starts camera live preview
+        print("Movimento detectado - " + getHour()) # Prints 'Movimento detectado' on terminal
         camera.capture(image) # Gets the image from camera
-        print("Imagem capturada")
-        resize = cv2.imread(image, cv2.IMREAD_UNCHANGED)
-        scale_percent = 38 # percent of original size
-        width = int(resize.shape[1] * scale_percent / 100)
-        height = int(resize.shape[0] * scale_percent / 100)
-        dim = (width, height)
-        # resize image
-        resized = cv2.resize(resize, dim, interpolation = cv2.INTER_AREA)
-        cv2.imwrite(image, resized)
-        #camera.stop_preview() # Stops camera live preview
+        print("Imagem capturada - " + getHour())
+        resizeImage(image)
         confidence, frame = detection(image)
         if confidence != None:
-            print("Pessoa detectada - " + datetime.datetime.now().strftime("%H.%M.%S")) # Debugging
+            print("Pessoa detectada - " + getHour()) # Debugging
             send_alert(1, image, frame)
             genLog('pes') # Generates a person detection log
         else:
             genLog('mov') # Generates a motion detection log without a person
         eraseImages(execCount)
-        #time.sleep(2) # Waits 2 seconds for another work cycle
 
 main()
