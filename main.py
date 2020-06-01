@@ -10,21 +10,21 @@ CAMERA_CODE = 123456
 CAMERA_SECRET = 123456
 
 # Run when camera turns on
-def start_camera():
+def start_camera(camera):
     try:
-        url = HOST + "/camera"
+        url = HOST + "/api/camera"
 
         headers = { "content-type": "multipart/form-data",
                     "accept": "application/json" }
 
-        camera = PiCamera()
+        cam = camera
 
         image = getFileName() # Gets a filename
 
-        camera.capture(image) # Gets the image from camera
+        cam.capture(image) # Gets the image from camera
 
-        # Não sei se vai funcinar na PiCamera (Provalvemente vai)
-        imencoded = cv2.imencode(".jpeg", image)[1]
+        frame = cv2.imread(image)
+        imencoded = cv2.imencode(".jpeg", frame)[1]
         file = { "image": (image, imencoded.tostring(), "image/jpeg") } 
 
         data = { "code": CAMERA_CODE, "secret": CAMERA_SECRET }
@@ -96,6 +96,7 @@ def main():
     pir = MotionSensor(26)
     camera = PiCamera()
     execCount = 0
+    start_camera(camera)
 
     while True:    
         execCount += 1
